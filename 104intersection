@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+
+import sys
+from math import *
+
+def is_integer(n):
+    try:
+        int(n)
+    except ValueError:
+        return False
+    else:
+        return True
+
+def error_handling(argv) :
+    if (len(argv) != 9) :
+        return 1
+    if (int(argv[1]) != 1 and int(argv[1]) != 2 and int(argv[1]) != 3) :
+        return 1
+    if (is_integer(argv[2]) == False or is_integer(argv[3]) == False or is_integer(argv[4]) == False or is_integer(argv[5]) == False or is_integer(argv[6]) == False or
+    is_integer(argv[7]) == False or is_integer(argv[8]) == False) :
+        return 1
+
+def cone(gv) :
+    """tuple(float, float, float, float, float, float) -> Void *
+    Preconditions : None
+    Rôle : Cone function"""
+
+    print("Cone with a", int(gv[7]), "degree angle")
+    a = pow(gv[4], 2) + pow(gv[5], 2) - pow(gv[6], 2) * pow(tan(radians(gv[7])), 2)
+    b = 2 * (gv[1] * gv[4] + gv[2] * gv[5] - gv[3] * gv[6] * pow(tan(radians(gv[7])), 2))
+    c = pow(gv[1], 2) + pow(gv[2], 2) - pow(gv[3], 2) * pow(tan(radians(gv[7])), 2)
+    d = (b * b) - (4 * a * c)
+    if (a == 0) and (b == 0) :
+        return "infinite"
+    elif (a == 0) :
+        return (-c / b)
+    if (d < 0) :
+        return
+    elif (d > 0) :
+        t = ((-b + sqrt(d)) / (2 * a), (-b - sqrt(d)) / (2 * a))
+    else :
+        t = -b / (2 * a)
+    return t
+
+def cylinder(gv) :
+    """tuple(float, float, float, float, float, float) -> Void *
+    Preconditions : None
+    Rôle : Cylinder function"""
+
+    print("Cylinder of radius", int(gv[7]))
+    a = pow(gv[4], 2) + pow(gv[5], 2)
+    b = 2 * (gv[1] * gv[4] + gv[2] * gv[5])
+    c = pow(gv[1], 2) + pow(gv[2], 2)
+    c -= pow(gv[7], 2)
+    d = (b * b) - (4 * a * c)
+    if (a == 0 and b == 0) :
+        return "infinite"
+    elif (a == 0) :
+        return (-c / b)
+    if (d < 0) :
+        return
+    elif (d > 0) :
+        t = ((-b + sqrt(d)) / (2 * a), (-b - sqrt(d)) / (2 * a))
+    else :
+        t = -b / (2 * a)
+    return t
+
+def sphere(gv) :
+    """tuple(float, float, float, float, float, float) -> Void *
+    Preconditions : None
+    Rôle : Sphere function"""
+
+    print("Sphere of radius", int(gv[7]))
+    a = pow(gv[4], 2) + pow(gv[5], 2) + pow(gv[6], 2)
+    b = 2 * (gv[1] * gv[4] + gv[2] * gv[5] + gv[3] * gv[6])
+    c = pow(gv[1], 2) + pow(gv[2], 2) + pow(gv[3], 2)
+    c -= pow(gv[7], 2)
+    d = (b * b) - (4 * a * c)
+    if (a == 0) :
+        return (-c / b)
+    if (d < 0) or d == (2 * a) :
+        return
+    elif (d > 0) :
+        t = ((-b + sqrt(d)) / (2 * a), (-b - sqrt(d)) / (2 * a))
+    else :
+        t = -b / (2 * a)
+    return t
+
+def writing(t, v) :
+    """tuple(float, float, float, float, float, float) -> Void
+    Preconditions : None
+    Rôle : print the last message"""
+
+    if (type(t) == tuple) :
+        p1 = ((v[1] + v[4] * t[0]), (v[2] + v[5] * t[0]), (v[3] + v[6] * t[0]))
+        p2 = ((v[1] + v[4] * t[1]), (v[2] + v[5] * t[1]), (v[3] + v[6] * t[1]))
+        print("2 intersection points:\n(", "%.3f" %p1[0], ", ", "%.3f" %p1[1],\
+        ", ", "%.3f" %p1[2], ")\n(", "%.3f" %p2[0], ", ","%.3f" %p2[1], ", ",\
+        "%.3f" %p2[2], ")", sep = "")
+    elif (type(t) == float) :
+        point = ((v[1] + v[4] * t), (v[2] + v[5] * t), (v[3] + v[6] * t))
+        print("1 intersection point:\n(", "%.3f" %point[0], ", ",\
+        "%.3f" %point[1], ", ", "%.3f" %point[2], ")", sep = "")
+    elif (type(t) == str) :
+        print("There is an infinite number of intersection points.")
+    else :
+        print("No intersection point.")
+
+def main(sys) :
+    """list[str] -> Int
+    Preconditions : len(sys.argv) > 5
+    Rôle : Main function"""
+
+    function = {"3": cone, "2" : cylinder, "1" : sphere}
+    if (error_handling(sys.argv) == 1) :
+        return 84
+    gv = (float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]),\
+          float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]),\
+          float(sys.argv[7]), float(sys.argv[8]),)
+    if (gv[4] == gv[5] and gv[5] == gv[6] and gv[6] == 0) :
+        print("No line defined (Vector is null)")
+        return 84
+    for y in range(1, 4, 1) :
+        if (str(y) == sys.argv[1]) :
+            t = function[str(y)](gv)
+    print("Line passing through the point (", sys.argv[2], ", ", sys.argv[3],\
+    ", ", sys.argv[4], ") and parallel to the vector (", sys.argv[5], ", ",\
+    sys.argv[6], ", ", sys.argv[7], ")", sep = "")
+    writing(t, gv)
+    return 84
+
+main(sys)
